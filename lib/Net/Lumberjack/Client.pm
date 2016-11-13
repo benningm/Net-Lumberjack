@@ -111,11 +111,11 @@ SSL certificate verification.
 This could be used if you use a IP address to connecting to
 server that only lists the hostname in its certificate.
 
-=head2 ssl_cert_file (default: empty)
+=head2 ssl_cert (default: empty)
 
-=head2 ssl_key_file (default: empty)
+=head2 ssl_key (default: empty)
 
-If 'ssl_cert_file' and 'ssl_key_file' is the client will enable
+If 'ssl_cert' and 'ssl_key' is the client will enable
 client side authentication and use the supplied certificate/key.
 
 =head1 METHODS
