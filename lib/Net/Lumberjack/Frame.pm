@@ -26,8 +26,12 @@ our %FRAME_TYPES = (
 sub new_from_fh {
 	my ( $class, $fh ) = ( shift, shift );
 	my ( $version, $type );
-	if( $fh->eof || ! $fh->read( $version, 1 ) || ! $fh->read( $type, 1 ) ) {
-		return; # no more data?
+  # EOF not supported by IO::Socket::SSL
+  #if( $fh->eof ) {
+  #  return;
+  #}
+  if( ! $fh->read( $version, 1 ) || ! $fh->read( $type, 1 ) ) {
+    die('lost connection');
 	}
 
   if( ! defined $FRAME_TYPES{$type} ) {

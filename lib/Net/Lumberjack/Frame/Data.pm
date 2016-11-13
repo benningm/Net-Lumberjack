@@ -19,6 +19,11 @@ has 'payload' => (
     my $pairs = scalar keys %{$self->data};
     my $data = '';
     foreach my $key ( keys %{$self->data} ) {
+      # skip if emtpy or not a scalar
+      if( ! defined $self->data->{$key}
+          || ref($self->data->{$key}) ) {
+        next;
+      }
       my $keylen = length($key);
       $data .= pack('N', $keylen).$key;
       my $valuelen = length( $self->data->{$key} );

@@ -20,9 +20,24 @@ has 'seq' => (
   },
 );
 has 'last_ack' => ( is => 'rw', isa => 'Int', default => 0 );
-has 'max_window_size' => ( is => 'rw', isa => 'Int', default => 50 );
+has 'max_window_size' => ( is => 'rw', isa => 'Int', default => 2048 );
 
 has 'current_window_size' => ( is => 'rw', isa => 'Int', default => 0 );
+
+has 'frame_format' => ( is => 'ro', isa => 'Str', default => 'json');
+has '_frame_class' => (
+  is => 'ro', isa => 'Str', lazy => 1,
+  default => sub {
+    my $self = shift;
+    if( $self->frame_format eq 'json' || $self->frame_format eq 'v2' ) {
+      return "Net::Lumberjack::Frame::JSON";
+    } elsif( $self->frame_format eq 'data' || $self->frame_format eq 'v1' ) {
+      return "Net::Lumberjack::Frame::Data";
+    } else {
+      die('invalid frame format specified: '.$self->frame_format);
+    }
+  },
+);
 
 sub set_window_size {
 	my ( $self, $size ) = @_;
@@ -49,7 +64,8 @@ sub send_data {
     $self->set_window_size( $num_bulk );
     my $stream = '';
     for( my $i = 0 ; $i < $num_bulk ; $i++ ) {
-      my $frame = Net::Lumberjack::Frame::JSON->new(
+      my $frame_class = $self->_frame_class;
+      my $frame = $frame_class->new(
         seq => $self->next_seq,
         data => shift(@data),
       );
