@@ -1,0 +1,5 @@
+.build
+Net-Lumberjack-*
+.*.swp
+local
+cpanfile.snapshot
