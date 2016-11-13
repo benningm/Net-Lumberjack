@@ -9,6 +9,123 @@ use IO::Socket::INET6;
 use IO::Socket::SSL;
 use Net::Lumberjack::Writer;
 
+=head1 SYNOPSIS
+
+  use Net::Lumberjack::Client;
+
+  my $client = Net::Lumberjack::Client->new(
+    host => '127.0.0.1',
+    port => 5044,
+    # for beats server
+    keepalive => 0,
+    frame_format => 'json',
+    ## for a saftpresse (Log::Saftpresse) server
+    # keepalive => 1, # or 0
+    # frame_format => 'json',
+    ## for a lumberjack (v1) server
+    # keepalive => 1,
+    # frame_format => 'data',
+  );
+
+  $client->send_data(
+   { message => 'hello world!', lang => 'en' },
+   { message => 'Hallo Welt!', lang => 'de' },
+  );
+
+=head1 ATTRIBUTES
+
+=head2 host (default: '127.0.0.1')
+
+Host to connect to.
+
+=head2 port (default: 5044)
+
+TCP port to connect to.
+
+=head2 keepalive (default: 0)
+
+If enabled connection will be keept open between send_data() calls.
+Otherwise it will be closed and reopened on every call.
+
+Needs to be disabled for logstash-input-beats since it expects only 
+one bulk of frames per connection.
+
+=head2 frame_formt (default: 'json')
+
+The following frame formats are supported:
+
+=over
+
+=item 'json', 'v2'
+
+Uses json formatted data frames as defined in lumberjack protocol v2. (type 'J')
+
+=item 'data', 'v1'
+
+Uses lumberjack DATA (type 'D') frames as defined in lumberjack protocol v1.
+
+This format only supports a flat hash structure.
+
+=back
+
+=head2 max_window_size (default: 2048)
+
+Maximum number of frames the clients sends in one bulk.
+
+When hitting this limit the client will split up the stream
+into smaller bulks.
+
+=head2 use_ssl (default: 0)
+
+Enable SSL transport encryption.
+
+=head2 ssl_verify (default: 1)
+
+Enable verification of SSL server certificate.
+
+=head2 ssl_ca_file (default: emtpy)
+
+Use a non-default CA file to retrieve list of trusted root CAs.
+
+Otherwise the system wide default will be used.
+
+=head2 ssl_ca_path (default: emtpy)
+
+Use a non-default CA path to retrieve list of trusted root CAs.
+
+Otherwise the system wide default will be used.
+
+=head2 ssl_version (default: empty)
+
+Use a non-default SSL protocol version string.
+
+Otherwise the system wide default will be used.
+
+Check L<IO::Socket::SSL> for string format.
+
+=head2 ssl_hostname (default: emtpy)
+
+Use a hostname other than the hostname give in 'host' for
+SSL certificate verification.
+
+This could be used if you use a IP address to connecting to
+server that only lists the hostname in its certificate.
+
+=head2 ssl_cert_file (default: empty)
+
+=head2 ssl_key_file (default: empty)
+
+If 'ssl_cert_file' and 'ssl_key_file' is the client will enable
+client side authentication and use the supplied certificate/key.
+
+=head1 METHODS
+
+=head2 send_data( HashRef1, ... )
+
+This method takes a list of HashRefs and sends them to the server.
+
+=cut
+
 has 'host' => ( is => 'ro', isa => 'Str', default => '127.0.0.1' );
 has 'port' => ( is => 'ro', isa => 'Int', default => 5044 );
 has 'keepalive' => ( is => 'ro', isa => 'Bool', default => 0 );
