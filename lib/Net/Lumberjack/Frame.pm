@@ -27,12 +27,18 @@ sub new_from_fh {
 	my ( $class, $fh ) = ( shift, shift );
 	my ( $version, $type );
   # EOF not supported by IO::Socket::SSL
-  #if( $fh->eof ) {
-  #  return;
-  #}
+  if( ref($fh) eq 'IO::Socket::SSL') {
+    if( ! $fh->pending ) {
+      return;
+    }
+  } else {
+    if( $fh->eof ) {
+      return;
+    }
+  }
   if( ! $fh->read( $version, 1 ) || ! $fh->read( $type, 1 ) ) {
     die('lost connection');
-	}
+  }
 
   if( ! defined $FRAME_TYPES{$type} ) {
     die('Unknown Lumberjack frame type: '.$type.'('.ord($type).')');
