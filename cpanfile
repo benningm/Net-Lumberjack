@@ -9,10 +9,11 @@ requires 'IO::String';
 requires 'JSON';
 requires 'Moose';
 
-#on 'test' => sub {
+on 'test' => sub {
+  requires 'Test::Pod';
 #  requires 'Test::More';
 #  requires 'File::Find';
-#};
+};
 
 on 'develop' => sub {
   requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
